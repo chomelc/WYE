@@ -8,6 +8,8 @@
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 - [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/)
 - [Peewee](http://docs.peewee-orm.com/en/latest/)
+- [Click](https://click.palletsprojects.com/en/8.0.x/)
+- [Unidecode](https://pypi.org/project/Unidecode/)
 
 Install all the dependencies with:
 ```bash
