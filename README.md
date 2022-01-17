@@ -7,6 +7,7 @@
 - Python 3
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 - [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/)
+- [Peewee](http://docs.peewee-orm.com/en/latest/)
 
 Install all the dependencies with:
 ```bash
