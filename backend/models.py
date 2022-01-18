@@ -36,9 +36,9 @@ def create_tables():
         database.create_tables([Meal, Category, Day])
 
 def populate_tables():
-    Category.create(name="entrée", slug="entree")
-    Category.create(name="plat", slug="plat")
-    Category.create(name="dessert", slug="dessert")
+    Category.create(name="Entrée", slug="entree")
+    Category.create(name="Plat", slug="plat")
+    Category.create(name="Dessert", slug="dessert")
     Meal.create(name="Lasagnes", slug="lasagnes", category="plat")
     Meal.create(name="Tomates-Mozza", slug="tomates-mozza", category="entree")
     Meal.create(name="Glace", slug="glace", category="dessert")

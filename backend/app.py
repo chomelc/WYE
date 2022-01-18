@@ -148,19 +148,19 @@ api.add_resource(DayAPI, '/wye/days/<string:day_slug>')
 def initdb():
     # creating the database
     create_tables()
-    click.echo('Initialized the database')
+    click.echo('Initialized the database.')
 
 @app.cli.command()
 def populatedb():
     # creating the database
     populate_tables()
-    click.echo('Populated the database')
+    click.echo('Populated the database.')
 
 @app.cli.command()
 def dropdb():
     # dropping the database tables
     drop_tables()
-    click.echo('Dropped tables from database')
+    click.echo('Dropped tables from database.')
 
 # ----------- RUNNING THE APP ----------- #
 
