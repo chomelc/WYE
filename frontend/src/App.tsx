@@ -1,25 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { CssBaseline } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Meals from "./routes/meals";
+import Profile from "./routes/profile";
+import Root from "./routes/root";
+import Settings from "./routes/settings";
+
+const MYETheme = createTheme({
+  palette: {
+    primary: {
+      main: '#312F2F'
+    },
+    secondary: {
+      main: '#A8A39D'
+    },
+    background: {
+      paper: "#FFFFFF",
+      default: "#F8F1E9"
+    },
+    text:{
+      primary: "#312F2F",
+      secondary: '#A8A39D'
+      
+    }
+  },
+});
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={MYETheme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Root />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/meals" element={<Meals />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
