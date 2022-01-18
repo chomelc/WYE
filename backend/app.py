@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import reqparse, Resource, Api, fields, marshal_with, abort
-from models import Category, Meal, create_tables, populate_tables, drop_tables
+from models import Category, Meal, Day, create_tables, populate_tables, drop_tables
+from functions import getDateDay
 import click
 from unidecode import unidecode
 
@@ -20,6 +21,17 @@ meals_fields = {
 }
 meals_fields['category'] = fields.Nested(categories_fields)
 
+days_fields = {
+    'day': fields.String,
+    'date': fields.String,
+    'slug':  fields.String
+}
+days_fields['breakfast'] = fields.Nested(meals_fields)
+days_fields['lunch'] = fields.Nested(meals_fields)
+days_fields['dinner'] = fields.Nested(meals_fields)
+
+# ----------- FUNCTIONS ----------- #
+
 # aborting operation if the corresponding slug doesn't exist
 def abort_if_meal_doesnt_exist(meal_slug):
     query = Meal.select(Meal.slug).dicts()
@@ -27,10 +39,17 @@ def abort_if_meal_doesnt_exist(meal_slug):
                       for value in elem.values()]:
         abort(404, message="'{}' doesn't exist".format(meal_slug))
 
+def abort_if_day_doesnt_exist(day_slug):
+    query = Day.select(Day.slug).dicts()
+    if day_slug not in [value for elem in query
+                      for value in elem.values()]:
+        abort(404, message="'{}' doesn't exist".format(day_slug))
+
 # initializing parser
-parser = reqparse.RequestParser()
-parser.add_argument('name')
-parser.add_argument('category')
+meal_parser = day_parser = reqparse.RequestParser()
+meal_parser.add_argument('name')
+meal_parser.add_argument('category')
+day_parser.add_argument('date')
 
 # ----------- APIs ----------- #
 
@@ -40,7 +59,7 @@ class MealsAPI(Resource):
         return [d for d in Meal.select()]
 
     def post(self):
-        args = parser.parse_args()
+        args = meal_parser.parse_args()
         name = args['name']
         slug = unidecode(name).lower()
         category = args['category']
@@ -63,7 +82,7 @@ class MealAPI(Resource):
 
     def put(self, meal_slug):
         abort_if_meal_doesnt_exist(meal_slug)
-        args = parser.parse_args()
+        args = meal_parser.parse_args()
         nname = args['name']
         ncategory = args['category']
         query = Meal.update({Meal.name: nname, Meal.category: ncategory}).where(Meal.slug == meal_slug)
@@ -78,6 +97,27 @@ class CategoriesAPI(Resource):
         return [d for d in Category.select()]
 
 api.add_resource(CategoriesAPI, '/wye/categories/')
+
+class DaysAPI(Resource):
+    @marshal_with(days_fields)
+    def get(self):
+        return [d for d in Day.select()]
+
+    def post(self):
+        args = day_parser.parse_args()
+        date = args['date']
+        Day.create(day=getDateDay(date), date=date, slug=date, breakfast=None, lunch=None, dinner=None)
+        return '', 201
+
+api.add_resource(DaysAPI, '/wye/days/')
+
+class DayAPI(Resource):
+    @marshal_with(days_fields)
+    def get(self, day_slug):
+        abort_if_day_doesnt_exist(day_slug)
+        return Day.select().where(Day.slug == day_slug).dicts().get()
+
+api.add_resource(DayAPI, '/wye/days/<string:day_slug>')
 
 # ----------- CLI COMMANDS ----------- #
 
