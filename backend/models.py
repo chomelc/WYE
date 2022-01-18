@@ -15,34 +15,43 @@ class Category(BaseModel):
     name = CharField()
     slug = CharField(primary_key=True)
 
-class Meal(BaseModel):
+class Dish(BaseModel):
     name = CharField()
     slug = CharField(primary_key=True)
-    category = ForeignKeyField(Category, backref="meals")
+    category = ForeignKeyField(Category, backref="dish")
 
+class Meal(BaseModel):
+    dishes = ManyToManyField(Dish, backref="dishes")
+
+MealDish = Meal.dishes.get_through_model()
 
 class Day(BaseModel):
     day = CharField()
     date = DateField('%d-%m-%Y')
     slug = CharField(primary_key=True)
-    breakfast = ForeignKeyField(Meal, backref="day_meals", null=True)
-    lunch = ForeignKeyField(Meal, backref="day_meals", null=True)
-    dinner = ForeignKeyField(Meal, backref="day_meals", null=True)
+    breakfast = ForeignKeyField(Dish, backref="day_dishes", null=True)
+    lunch = ForeignKeyField(Dish, backref="day_dishes", null=True)
+    dinner = ForeignKeyField(Dish, backref="day_dishes", null=True)
 
 # ----------- OPERATIONS ----------- #
 
 def create_tables():
     with database:
-        database.create_tables([Meal, Category, Day])
+        database.create_tables([Meal, Dish, Category, MealDish, Day])
 
 def populate_tables():
     Category.create(name="Entrée", slug="entree")
     Category.create(name="Plat", slug="plat")
     Category.create(name="Dessert", slug="dessert")
-    Meal.create(name="Lasagnes", slug="lasagnes", category="plat")
-    Meal.create(name="Tomates-Mozza", slug="tomates-mozza", category="entree")
-    Meal.create(name="Glace", slug="glace", category="dessert")
-    Meal.create(name="Brunch", slug="brunch", category="plat")
+    Dish.create(name="Lasagnes", slug="lasagnes", category="plat")
+    Dish.create(name="Poulet à la crème", slug="poulet-creme", category="plat")
+    Dish.create(name="Riz", slug="riz", category="plat")
+    Dish.create(name="Tomates-Mozza", slug="tomates-mozza", category="entree")
+    Dish.create(name="Glace", slug="glace", category="dessert")
+    Dish.create(name="Brunch", slug="brunch", category="plat")
+    MealDish.create(meal=1, dish="poulet-creme")
+    MealDish.create(meal=1, dish="riz")
+    MealDish.create(meal=2, dish="lasagnes")
     date='18-01-2022'
     Day.create(day=getDateDay(date), date=date, slug=date, breakfast="brunch", lunch=None, dinner="lasagnes")
     date='19-01-2022'
@@ -50,4 +59,4 @@ def populate_tables():
 
 def drop_tables():
     with database:
-        database.drop_tables([Meal, Category, Day])
+        database.drop_tables([Meal, Dish, Category, MealDish, Day])

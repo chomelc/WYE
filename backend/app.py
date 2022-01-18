@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import reqparse, Resource, Api, fields, marshal_with, abort
-from models import Category, Meal, Day, create_tables, populate_tables, drop_tables
+from models import Category, Dish, MealDish, Meal, Day, create_tables, populate_tables, drop_tables
 from functions import getDateDay
 import click
 from peewee import *
@@ -16,29 +16,34 @@ categories_fields = {
     'slug': fields.String,
 }
 
-meals_fields = {
+dishes_fields = {
     'name': fields.String,
     'slug': fields.String,
 }
-meals_fields['category'] = fields.Nested(categories_fields)
+dishes_fields['category'] = fields.Nested(categories_fields)
+
+meals_fields = {
+    'meal': fields.Integer,
+    'dishes': fields.List(fields.Nested(dishes_fields))
+}
 
 days_fields = {
     'day': fields.String,
     'date': fields.String,
     'slug':  fields.String
 }
-days_fields['breakfast'] = fields.Nested(meals_fields)
-days_fields['lunch'] = fields.Nested(meals_fields)
-days_fields['dinner'] = fields.Nested(meals_fields)
+days_fields['breakfast'] = fields.Nested(dishes_fields)
+days_fields['lunch'] = fields.Nested(dishes_fields)
+days_fields['dinner'] = fields.Nested(dishes_fields)
 
 # ----------- FUNCTIONS ----------- #
 
 # aborting operation if the corresponding slug doesn't exist
-def abort_if_meal_doesnt_exist(meal_slug):
-    query = Meal.select(Meal.slug).dicts()
-    if meal_slug not in [value for elem in query
+def abort_if_dish_doesnt_exist(dish_slug):
+    query = Dish.select(Dish.slug).dicts()
+    if dish_slug not in [value for elem in query
                       for value in elem.values()]:
-        abort(404, message="'{}' doesn't exist".format(meal_slug))
+        abort(404, message="'{}' doesn't exist".format(dish_slug))
 
 def abort_if_day_doesnt_exist(day_slug):
     query = Day.select(Day.slug).dicts()
@@ -47,58 +52,61 @@ def abort_if_day_doesnt_exist(day_slug):
         abort(404, message="'{}' doesn't exist".format(day_slug))
 
 # initializing parser
-meal_parser = day_parser = reqparse.RequestParser()
-meal_parser.add_argument('name')
-meal_parser.add_argument('category')
+dish_parser = day_parser = reqparse.RequestParser()
+dish_parser.add_argument('name')
+dish_parser.add_argument('category')
 day_parser.add_argument('date')
+day_parser.add_argument('breakfast')
+day_parser.add_argument('lunch')
+day_parser.add_argument('dinner')
 
 # ----------- APIs ----------- #
 
-Breakfast = Meal.alias()
-Lunch = Meal.alias()
-Dinner = Meal.alias()
+Breakfast = Dish.alias()
+Lunch = Dish.alias()
+Dinner = Dish.alias()
 c1 = Category.alias()
 c2 = Category.alias()
 c3 = Category.alias()
 
-class MealsAPI(Resource):
-    @marshal_with(meals_fields)
+class DishesAPI(Resource):
+    @marshal_with(dishes_fields)
     def get(self):
-        return [d for d in Meal.select()]
+        return [d for d in Dish.select()]
 
     def post(self):
-        args = meal_parser.parse_args()
+        args = dish_parser.parse_args()
         name = args['name']
         slug = unidecode(name).lower()
         category = args['category']
-        Meal.create(name=name, slug=slug, category=category)
+        Dish.create(name=name, slug=slug, category=category)
         return '', 201
 
-api.add_resource(MealsAPI, '/wye/meals/')
+api.add_resource(DishesAPI, '/wye/dishes/')
 
-class MealAPI(Resource):
-    @marshal_with(meals_fields)
-    def get(self, meal_slug):
-        abort_if_meal_doesnt_exist(meal_slug)
-        query = Meal.select().where(Meal.slug == meal_slug).join(Category, on=(Category.slug == Meal.category))
+class DishAPI(Resource):
+    @marshal_with(dishes_fields)
+    def get(self, dish_slug):
+        abort_if_dish_doesnt_exist(dish_slug)
+        query = Dish.select().where(Dish.slug == dish_slug).join(Category, on=(Category.slug == Dish.category))
         return [d for d in query]
 
-    def delete(self, meal_slug):
-        abort_if_meal_doesnt_exist(meal_slug)
-        query = Meal.delete().where(Meal.slug == meal_slug)
+    def delete(self, dish_slug):
+        abort_if_dish_doesnt_exist(dish_slug)
+        query = Dish.delete().where(Dish.slug == dish_slug)
         query.execute()
         return '', 204
 
-    def put(self, meal_slug):
-        abort_if_meal_doesnt_exist(meal_slug)
-        args = meal_parser.parse_args()
+    def put(self, dish_slug):
+        abort_if_dish_doesnt_exist(dish_slug)
+        args = dish_parser.parse_args()
         nname = args['name']
         ncategory = args['category']
-        query = Meal.update({Meal.name: nname, Meal.category: ncategory}).where(Meal.slug == meal_slug)
+        query = Dish.update({Dish.name: nname, Dish.category: ncategory}).where(Dish.slug == dish_slug)
         query.execute()
         return '', 201
 
-api.add_resource(MealAPI, '/wye/meals/<string:meal_slug>')
+api.add_resource(DishAPI, '/wye/dishes/<string:dish_slug>')
 
 class CategoriesAPI(Resource):
     @marshal_with(categories_fields)
@@ -106,6 +114,13 @@ class CategoriesAPI(Resource):
         return [d for d in Category.select()]
 
 api.add_resource(CategoriesAPI, '/wye/categories/')
+
+class MealsAPI(Resource):
+    @marshal_with(meals_fields)
+    def get(self):
+        return [d for d in MealDish.select().dicts()]
+
+api.add_resource(MealsAPI, '/wye/meals/')
 
 class DaysAPI(Resource):
     @marshal_with(days_fields)
@@ -116,7 +131,7 @@ class DaysAPI(Resource):
             .switch(Day).join(Dinner, on=(Dinner.slug == Day.dinner), join_type=JOIN.LEFT_OUTER)
             .switch(Day).join(c1, on=(Breakfast.category == c1.slug), join_type=JOIN.LEFT_OUTER)
             .switch(Day).join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER))
+            .switch(Day).join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER).order_by(Day.slug))
         return [d for d in query]
 
     def post(self):
@@ -139,6 +154,22 @@ class DayAPI(Resource):
             .join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
             .join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER))
         return [d for d in query]
+
+    def delete(self, day_slug):
+        abort_if_day_doesnt_exist(day_slug)
+        query = Day.delete().where(Day.slug == day_slug)
+        query.execute()
+        return '', 204
+
+    def put(self, day_slug):
+        abort_if_day_doesnt_exist(day_slug)
+        args = day_parser.parse_args()
+        nbreakfast = args['breakfast']
+        nlunch = args['lunch']
+        ndinner = args['dinner']
+        query = Day.update({Day.breakfast: nbreakfast, Day.lunch: nlunch, Day.dinner: ndinner}).where(Day.slug == day_slug)
+        query.execute()
+        return '', 201
 
 api.add_resource(DayAPI, '/wye/days/<string:day_slug>')
 
