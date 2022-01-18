@@ -3,6 +3,7 @@ from flask_restful import reqparse, Resource, Api, fields, marshal_with, abort
 from models import Category, Meal, Day, create_tables, populate_tables, drop_tables
 from functions import getDateDay
 import click
+from peewee import *
 from unidecode import unidecode
 
 # ----------- APP SETUP ----------- #
@@ -53,6 +54,13 @@ day_parser.add_argument('date')
 
 # ----------- APIs ----------- #
 
+Breakfast = Meal.alias()
+Lunch = Meal.alias()
+Dinner = Meal.alias()
+c1 = Category.alias()
+c2 = Category.alias()
+c3 = Category.alias()
+
 class MealsAPI(Resource):
     @marshal_with(meals_fields)
     def get(self):
@@ -72,7 +80,8 @@ class MealAPI(Resource):
     @marshal_with(meals_fields)
     def get(self, meal_slug):
         abort_if_meal_doesnt_exist(meal_slug)
-        return Meal.select().where(Meal.slug == meal_slug).dicts().get()
+        query = Meal.select().where(Meal.slug == meal_slug).join(Category, on=(Category.slug == Meal.category))
+        return [d for d in query]
 
     def delete(self, meal_slug):
         abort_if_meal_doesnt_exist(meal_slug)
@@ -101,7 +110,14 @@ api.add_resource(CategoriesAPI, '/wye/categories/')
 class DaysAPI(Resource):
     @marshal_with(days_fields)
     def get(self):
-        return [d for d in Day.select()]
+        query = (Day.select()
+            .join(Breakfast, on=(Breakfast.slug == Day.breakfast), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(Lunch, on=(Lunch.slug == Day.lunch), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(Dinner, on=(Dinner.slug == Day.dinner), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(c1, on=(Breakfast.category == c1.slug), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER))
+        return [d for d in query]
 
     def post(self):
         args = day_parser.parse_args()
@@ -115,7 +131,14 @@ class DayAPI(Resource):
     @marshal_with(days_fields)
     def get(self, day_slug):
         abort_if_day_doesnt_exist(day_slug)
-        return Day.select().where(Day.slug == day_slug).dicts().get()
+        query = (Day.select().where(Day.slug == day_slug)
+            .join(Breakfast, on=(Breakfast.slug == Day.breakfast), join_type=JOIN.LEFT_OUTER)
+            .join(Lunch, on=(Lunch.slug == Day.lunch), join_type=JOIN.LEFT_OUTER)
+            .join(Dinner, on=(Dinner.slug == Day.dinner), join_type=JOIN.LEFT_OUTER)
+            .join(c1, on=(Breakfast.category == c1.slug), join_type=JOIN.LEFT_OUTER)
+            .join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
+            .join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER))
+        return [d for d in query]
 
 api.add_resource(DayAPI, '/wye/days/<string:day_slug>')
 
