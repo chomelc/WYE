@@ -20,7 +20,23 @@ const headingFont = createTheme({
   },
 });
 
-export default function HeaderBar() {
+export default function HeaderBar(props) {
+  const settingsBool = props.settings
+  let settings;
+
+  if (settingsBool) {
+    settings = <IconButton
+      size="large"
+      edge="start"
+      color="primary"
+      aria-label="settings"
+      component={Link}
+      to="/settings"
+    >
+      <SettingsIcon />
+    </IconButton>;
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color={"default"}>
@@ -30,16 +46,7 @@ export default function HeaderBar() {
               What ya eatin'?
           </Typography>
           </ThemeProvider>
-          <IconButton
-            size="large"
-            edge="start"
-            color="primary"
-            aria-label="settings"
-            component={Link}
-            to="/settings"
-          >
-            <SettingsIcon />
-          </IconButton>
+          {settings}
         </Toolbar>
       </AppBar>
     </Box>

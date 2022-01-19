@@ -3,5 +3,5 @@ import MealsPanel from "../components/MealsPanel";
 import HeaderBar from "../components/HeaderBar";
 
 export default function Root() {
-    return (<div> <HeaderBar /><MealsPanel /><BottomMenu /></div>);
+    return (<div> <HeaderBar settings={false}/><MealsPanel /><BottomMenu /></div>);
 }
