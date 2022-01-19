@@ -8,15 +8,14 @@ import { Box, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 export default function BottomMenu() {
-  const ref = React.useRef<HTMLDivElement>(null);
   const [value, setValue] = React.useState('meals');
 
-  const handleChange = (event, newValue) => {
+  const handleChange = (event: React.SyntheticEvent, newValue) => {
     setValue(newValue);
   }
 
   return (
-    <Box sx={{ pb: 7 }} ref={ref}>
+    <Box sx={{ pb: 7 }}>
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={6}>
         <BottomNavigation
           value={value}
