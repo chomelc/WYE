@@ -3,3 +3,4 @@ flask-restful
 peewee
 click
 unidecode
+flask-cors

@@ -5,10 +5,12 @@ from functions import getDateDay
 import click
 from peewee import *
 from unidecode import unidecode
+from flask_cors import CORS
 
 # ----------- APP SETUP ----------- #
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/wye/*": {"origins": "*"}})
 api = Api(app)
 
 users_fields = {
@@ -210,4 +212,4 @@ def dropdb():
 # ----------- RUNNING THE APP ----------- #
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=5000)
