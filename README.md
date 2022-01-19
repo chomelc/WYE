@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 Launch the server with: 
 ```bash
-python wye.py
+python app.py
 ```
 
 ## Front-end
@@ -66,32 +66,48 @@ In the project directory, you can run:
 
     You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-##### Learn More
+### Running the app in development
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Run the app with:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+yarn start
+```
 
--  Code Splitting
+Then go to http://127.0.0.1:3000.
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Building and the app with PWA requirements
 
--  Analyzing the Bundle Size
+In `package.json`, replace the `start` field with :
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```json
+"start": "export HTTPS=true&&PORT=3000 react-scripts start",
+```
 
--  Making a Progressive Web App
+Build the app with: 
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+yarn build
+```
 
--  Advanced Configuration
+Launch the built app with:
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+serve -s build
+```
 
--  Deployment
+Then go to https://127.0.0.1:8443.
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Run Lighthouse diagnostic
 
--  `yarn build` fails to minify
+Install [Lighthouse](https://developers.google.com/web/tools/lighthouse) with:
 
-    This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting##npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting##npm-run-build-fails-to-minify)
+```bash
+npm install -g lighthouse
+```
+
+Then run:
+
+```
+lighthouse --chrome-flags="--ignore-certificate-errors"  --view https://127.0.0.1:8443
+```
