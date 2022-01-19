@@ -1,5 +1,6 @@
 from peewee import *
 import click
+from unidecode import unidecode
 from functions import getDateDay
 
 database = SqliteDatabase("db/meals.sqlite3")
@@ -10,6 +11,12 @@ class BaseModel(Model):
 
     class Meta:
         database = database
+
+class User(BaseModel):
+    first_name = CharField()
+    last_name = CharField()
+    initials = CharField()
+    slug = CharField()
 
 class Category(BaseModel):
     name = CharField()
@@ -37,9 +44,15 @@ class Day(BaseModel):
 
 def create_tables():
     with database:
-        database.create_tables([Meal, Dish, Category, MealDish, Day])
+        database.create_tables([User, Meal, Dish, Category, MealDish, Day])
 
 def populate_tables():
+    first_name="Clémence"
+    last_name="Chomel"
+    User.create(first_name=first_name, last_name=last_name, initials=first_name[0]+last_name[0], slug=unidecode(first_name).lower()+"_"+unidecode(last_name).lower())
+    first_name="Axel"
+    last_name="Raux"
+    User.create(first_name=first_name, last_name=last_name, initials=first_name[0]+last_name[0], slug=unidecode(first_name).lower()+"_"+unidecode(last_name).lower())
     Category.create(name="Entrée", slug="entree")
     Category.create(name="Plat", slug="plat")
     Category.create(name="Dessert", slug="dessert")
@@ -59,4 +72,4 @@ def populate_tables():
 
 def drop_tables():
     with database:
-        database.drop_tables([Meal, Dish, Category, MealDish, Day])
+        database.drop_tables([User, Meal, Dish, Category, MealDish, Day])

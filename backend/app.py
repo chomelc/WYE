@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import reqparse, Resource, Api, fields, marshal_with, abort
-from models import Category, Dish, MealDish, Meal, Day, create_tables, populate_tables, drop_tables
+from models import User, Category, Dish, MealDish, Meal, Day, create_tables, populate_tables, drop_tables
 from functions import getDateDay
 import click
 from peewee import *
@@ -10,6 +10,13 @@ from unidecode import unidecode
 
 app = Flask(__name__)
 api = Api(app)
+
+users_fields = {
+    'first_name': fields.String,
+    'last_name': fields.String,
+    'initials': fields.String,
+    'slug': fields.String
+}
 
 categories_fields = {
     'name': fields.String,
@@ -68,6 +75,13 @@ Dinner = Dish.alias()
 c1 = Category.alias()
 c2 = Category.alias()
 c3 = Category.alias()
+
+class UsersAPI(Resource):
+    @marshal_with(users_fields)
+    def get(self):
+        return [d for d in User.select()]
+
+api.add_resource(UsersAPI, '/wye/users/')
 
 class DishesAPI(Resource):
     @marshal_with(dishes_fields)
