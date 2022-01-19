@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import MobileTimePicker from '@mui/lab/MobileTimePicker';
+import { Link } from "react-router-dom";
 
 
 export default function SettingsPanel() {
@@ -131,7 +132,7 @@ export default function SettingsPanel() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Grid container direction="row" alignItems="center">
-                        <LogoutIcon /><Button variant="text">Déconnexion</Button>
+                        <LogoutIcon /><Button variant="text" component={Link} to="/">Déconnexion</Button>
                     </Grid>
                 </AccordionDetails>
             </Accordion>
