@@ -1,12 +1,12 @@
 import { CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Meals from "./routes/meals";
 import Profile from "./routes/profile";
 import Root from "./routes/root";
 import Settings from "./routes/settings";
 import History from "./routes/history";
+import { ReactSession } from 'react-client-session';
 
 const MYETheme = createTheme({
   palette: {
@@ -16,20 +16,24 @@ const MYETheme = createTheme({
     secondary: {
       main: '#A8A39D'
     },
+    success: {
+      main: '#1D5722',
+    },
     background: {
       paper: "#FFFFFF",
       default: "#F8F1E9"
     },
-    text:{
+    text: {
       primary: "#312F2F",
       secondary: '#A8A39D'
-      
+
     }
   },
 });
 
 
 function App() {
+  ReactSession.setStoreType("localStorage");
   return (
     <ThemeProvider theme={MYETheme}>
       <CssBaseline />

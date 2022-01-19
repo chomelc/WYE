@@ -1,7 +1,6 @@
-import BottomMenu from "../components/BottomMenu";
-import MealsPanel from "../components/MealsPanel";
+import LoginPanel from "../components/LoginPanel";
 import HeaderBar from "../components/HeaderBar";
 
 export default function Root() {
-    return (<div> <HeaderBar settings={false}/><MealsPanel /><BottomMenu /></div>);
+    return (<div> <HeaderBar settings={false}/><LoginPanel /></div>);
 }
