@@ -7,20 +7,24 @@ import HistoryIcon from '@mui/icons-material/History';
 import { Box, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-export default function BottomMenu() {
-  const [value, setValue] = React.useState('meals');
-
-  const handleChange = (event: React.SyntheticEvent, newValue) => {
-    setValue(newValue);
+function getPageValue(route) {
+  switch (route) {
+    case '/history': return "history";
+    case '/meals': return "meals";
+    case '/profile': return "profile";
+    default: return "meals";
   }
+}
+
+export default function BottomMenu() {
+  const pathname = window.location.pathname
+
+  const value = getPageValue(pathname);
 
   return (
     <Box sx={{ pb: 7 }}>
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={6}>
-        <BottomNavigation
-          value={value}
-          onChange={handleChange}
-        >
+        <BottomNavigation value={value}>
           <BottomNavigationAction component={Link} to="/history" value="history" label="Historique" icon={<HistoryIcon />} />
           <BottomNavigationAction component={Link} to="/meals" value="meals" label="Repas" icon={<RestaurantIcon />} />
           <BottomNavigationAction component={Link} to="/profile" value="profile" label="Profil" icon={<PersonIcon />} />
