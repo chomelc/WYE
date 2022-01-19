@@ -6,6 +6,7 @@ import Meals from "./routes/meals";
 import Profile from "./routes/profile";
 import Root from "./routes/root";
 import Settings from "./routes/settings";
+import History from "./routes/history";
 
 const MYETheme = createTheme({
   palette: {
@@ -38,6 +39,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/meals" element={<Meals />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/history" element={<History />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
