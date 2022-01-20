@@ -29,10 +29,9 @@ class Dish(BaseModel):
 
 class Meal(BaseModel):
     id = IntegerField(primary_key=True)
+    dishes = ManyToManyField(Dish, backref="dishes")
 
-class MealDish (BaseModel):
-    meal = ForeignKeyField(Meal, backref="meal")
-    dish = ForeignKeyField(Dish, backref="dish")
+MealDish = Meal.dishes.get_through_model()
 
 class Day(BaseModel):
     day = CharField()

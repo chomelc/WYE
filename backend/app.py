@@ -42,11 +42,11 @@ meals_fields['dish'] = fields.Nested(dishes_fields)
 days_fields = {
     'day': fields.String,
     'date': fields.String,
-    'slug':  fields.String
+    'slug':  fields.String,
+    'breakfast': fields.Nested(meal_fields),
+    'lunch"': fields.Nested(meal_fields),
+    'dinner': fields.Nested(meal_fields)
 }
-days_fields['breakfast'] = fields.Nested(meal_fields)
-days_fields['lunch'] = fields.Nested(meal_fields)
-days_fields['dinner'] = fields.Nested(meal_fields)
 
 # ----------- FUNCTIONS ----------- #
 
@@ -79,16 +79,6 @@ day_parser.add_argument('lunch')
 day_parser.add_argument('dinner')
 
 # ----------- APIs ----------- #
-
-Breakfast = MealDish.alias()
-Lunch = MealDish.alias()
-Dinner = MealDish.alias()
-d1 = Dish.alias()
-d2 = Dish.alias()
-d3 = Dish.alias()
-c1 = Category.alias()
-c2 = Category.alias()
-c3 = Category.alias()
 
 class UsersAPI(Resource):
     @marshal_with(users_fields)
@@ -161,16 +151,12 @@ class MealAPI(Resource):
 api.add_resource(MealAPI, '/wye/meals/<int:meal_id>')
 
 class DaysAPI(Resource):
-    # @marshal_with(days_fields)
+    @marshal_with(days_fields)
     def get(self):
         query = (Day.select()
-            .join(Breakfast, on=(Breakfast.meal == Day.breakfast), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(Lunch, on=(Lunch.meal == Day.lunch), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(Dinner, on=(Dinner.meal == Day.dinner), join_type=JOIN.LEFT_OUTER)    
-            .switch(Day).join(d1, on=(d1.slug == Breakfast.dish), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(d2, on=(d2.slug == Lunch.dish), join_type=JOIN.LEFT_OUTER) 
-            .switch(Day).join(d3, on=(d3.slug == Dinner.dish), join_type=JOIN.LEFT_OUTER)
-            .order_by(Day.slug).dicts())
+        .group_by(Day.slug).order_by(Day.date)
+        )
+        print(query)
         return [d for d in query]
 
     def post(self):
