@@ -7,6 +7,7 @@ import Root from "./routes/root";
 import Settings from "./routes/settings";
 import History from "./routes/history";
 import { ReactSession } from 'react-client-session';
+import DayMeals from "./routes/daymeals";
 
 const MYETheme = createTheme({
   palette: {
@@ -42,6 +43,7 @@ function App() {
           <Route path="/" element={<Root />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/meals" element={<Meals />} />
+          <Route path="/meals/:date" element={<DayMeals />}/>
           <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
         </Routes>
