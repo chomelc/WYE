@@ -39,7 +39,7 @@ export default function MealsPanel() {
                                     <Grid item xs={4}>
                                         <Grid container direction="row-reverse">
                                             <Grid item>
-                                                <Chip label="Date" variant="outlined" />
+                                                <Chip label={d.date} variant="outlined" />
                                             </Grid>
                                         </Grid>
                                     </Grid>
