@@ -31,18 +31,22 @@ dishes_fields = {
 }
 dishes_fields['category'] = fields.Nested(categories_fields)
 
-meals_fields = {
-    'meal' : { 'dish': fields.Nested(dishes_fields) }
+meal_fields = {
+    'id': fields.Integer
 }
+
+meals_fields = { }
+meals_fields['meal'] = fields.Nested(meal_fields)
+meals_fields['dish'] = fields.Nested(dishes_fields)
 
 days_fields = {
     'day': fields.String,
     'date': fields.String,
     'slug':  fields.String
 }
-days_fields['breakfast'] = fields.Nested(dishes_fields)
-days_fields['lunch'] = fields.Nested(dishes_fields)
-days_fields['dinner'] = fields.Nested(dishes_fields)
+days_fields['breakfast'] = fields.Nested(meal_fields)
+days_fields['lunch'] = fields.Nested(meal_fields)
+days_fields['dinner'] = fields.Nested(meal_fields)
 
 # ----------- FUNCTIONS ----------- #
 
@@ -59,6 +63,12 @@ def abort_if_day_doesnt_exist(day_slug):
                       for value in elem.values()]:
         abort(404, message="'{}' doesn't exist".format(day_slug))
 
+def abort_if_meal_doesnt_exist(meal_id):
+    query = MealDish.select(MealDish.meal).dicts()
+    if meal_id not in [value for elem in query
+                      for value in elem.values()]:
+        abort(404, message="'{}' doesn't exist".format(meal_id))
+
 # initializing parser
 dish_parser = day_parser = reqparse.RequestParser()
 dish_parser.add_argument('name')
@@ -70,9 +80,12 @@ day_parser.add_argument('dinner')
 
 # ----------- APIs ----------- #
 
-Breakfast = Dish.alias()
-Lunch = Dish.alias()
-Dinner = Dish.alias()
+Breakfast = MealDish.alias()
+Lunch = MealDish.alias()
+Dinner = MealDish.alias()
+d1 = Dish.alias()
+d2 = Dish.alias()
+d3 = Dish.alias()
 c1 = Category.alias()
 c2 = Category.alias()
 c3 = Category.alias()
@@ -131,30 +144,33 @@ class CategoriesAPI(Resource):
 api.add_resource(CategoriesAPI, '/wye/categories/')
 
 class MealsAPI(Resource):
-    # @marshal_with(meals_fields)
+    @marshal_with(meals_fields)
     def get(self):
-        meals = {}
-        dishes = MealDish.select()
-        for dish in dishes:
-            nested_dish = Dish.select().where(Dish.slug == dish.dish_id).dicts().get()
-            if not dish.meal_id in meals:
-                meals[dish.meal_id] = []
-            meals[dish.meal_id].append(nested_dish)
-        response = meals
-        return response
+        query = (MealDish.select())
+        return [d for d in query]
 
 api.add_resource(MealsAPI, '/wye/meals/')
 
+class MealAPI(Resource):
+    @marshal_with(meals_fields)
+    def get(self, meal_id):
+        abort_if_meal_doesnt_exist(meal_id)
+        query = MealDish.select().where(MealDish.meal == meal_id)
+        return [d for d in query]
+
+api.add_resource(MealAPI, '/wye/meals/<int:meal_id>')
+
 class DaysAPI(Resource):
-    @marshal_with(days_fields)
+    # @marshal_with(days_fields)
     def get(self):
         query = (Day.select()
-            .join(Breakfast, on=(Breakfast.slug == Day.breakfast), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(Lunch, on=(Lunch.slug == Day.lunch), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(Dinner, on=(Dinner.slug == Day.dinner), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(c1, on=(Breakfast.category == c1.slug), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
-            .switch(Day).join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER).order_by(Day.slug))
+            .join(Breakfast, on=(Breakfast.meal == Day.breakfast), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(Lunch, on=(Lunch.meal == Day.lunch), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(Dinner, on=(Dinner.meal == Day.dinner), join_type=JOIN.LEFT_OUTER)    
+            .switch(Day).join(d1, on=(d1.slug == Breakfast.dish), join_type=JOIN.LEFT_OUTER)
+            .switch(Day).join(d2, on=(d2.slug == Lunch.dish), join_type=JOIN.LEFT_OUTER) 
+            .switch(Day).join(d3, on=(d3.slug == Dinner.dish), join_type=JOIN.LEFT_OUTER)
+            .order_by(Day.slug).dicts())
         return [d for d in query]
 
     def post(self):
@@ -166,16 +182,16 @@ class DaysAPI(Resource):
 api.add_resource(DaysAPI, '/wye/days/')
 
 class DayAPI(Resource):
-    @marshal_with(days_fields)
+    # @marshal_with(days_fields)
     def get(self, day_slug):
         abort_if_day_doesnt_exist(day_slug)
         query = (Day.select().where(Day.slug == day_slug)
-            .join(Breakfast, on=(Breakfast.slug == Day.breakfast), join_type=JOIN.LEFT_OUTER)
-            .join(Lunch, on=(Lunch.slug == Day.lunch), join_type=JOIN.LEFT_OUTER)
-            .join(Dinner, on=(Dinner.slug == Day.dinner), join_type=JOIN.LEFT_OUTER)
-            .join(c1, on=(Breakfast.category == c1.slug), join_type=JOIN.LEFT_OUTER)
-            .join(c2, on=(Lunch.category == c2.slug), join_type=JOIN.LEFT_OUTER)
-            .join(c3, on=(Dinner.category == c3.slug), join_type=JOIN.LEFT_OUTER))
+            .join(Breakfast, on=(Breakfast.meal == Day.breakfast), join_type=JOIN.LEFT_OUTER)
+            .join(Lunch, on=(Lunch.meal == Day.lunch), join_type=JOIN.LEFT_OUTER)
+            .join(Dinner, on=(Dinner.meal == Day.dinner), join_type=JOIN.LEFT_OUTER)    
+            .join(d1, on=(d1.slug == Breakfast.dish), join_type=JOIN.LEFT_OUTER)
+            .join(d2, on=(d2.slug == Lunch.dish), join_type=JOIN.LEFT_OUTER) 
+            .join(d3, on=(d3.slug == Dinner.dish), join_type=JOIN.LEFT_OUTER).dicts())
         return [d for d in query]
 
     def delete(self, day_slug):

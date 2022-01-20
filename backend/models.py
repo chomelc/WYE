@@ -28,17 +28,19 @@ class Dish(BaseModel):
     category = ForeignKeyField(Category, backref="dish")
 
 class Meal(BaseModel):
-    dishes = ManyToManyField(Dish, backref="dishes")
+    id = IntegerField(primary_key=True)
 
-MealDish = Meal.dishes.get_through_model()
+class MealDish (BaseModel):
+    meal = ForeignKeyField(Meal, backref="meal")
+    dish = ForeignKeyField(Dish, backref="dish")
 
 class Day(BaseModel):
     day = CharField()
     date = DateField('%d-%m-%Y')
     slug = CharField(primary_key=True)
-    breakfast = ForeignKeyField(Dish, backref="day_dishes", null=True)
-    lunch = ForeignKeyField(Dish, backref="day_dishes", null=True)
-    dinner = ForeignKeyField(Dish, backref="day_dishes", null=True)
+    breakfast = ForeignKeyField(Meal, backref="day_meals", null=True)
+    lunch = ForeignKeyField(Meal, backref="day_meals", null=True)
+    dinner = ForeignKeyField(Meal, backref="day_meals", null=True)
 
 # ----------- OPERATIONS ----------- #
 
@@ -62,14 +64,19 @@ def populate_tables():
     Dish.create(name="Tomates-Mozza", slug="tomates-mozza", category="entree")
     Dish.create(name="Glace", slug="glace", category="dessert")
     Dish.create(name="Brunch", slug="brunch", category="plat")
+    Meal.create(id=1)
+    Meal.create(id=2)
+    Meal.create(id=3)
+    MealDish.create(meal=1, dish="tomates-mozza")
     MealDish.create(meal=1, dish="poulet-creme")
     MealDish.create(meal=1, dish="riz")
     MealDish.create(meal=2, dish="lasagnes")
     MealDish.create(meal=2, dish="glace")
+    MealDish.create(meal=3, dish="brunch")
     date='18-01-2022'
-    Day.create(day=getDateDay(date), date=date, slug=date, breakfast="brunch", lunch=None, dinner="lasagnes")
+    Day.create(day=getDateDay(date), date=date, slug=date, breakfast=3, lunch=None, dinner=2)
     date='19-01-2022'
-    Day.create(day=getDateDay(date), date=date, slug=date, breakfast=None, lunch="tomates-mozza", dinner=None)
+    Day.create(day=getDateDay(date), date=date, slug=date, breakfast=None, lunch=1, dinner=None)
 
 def drop_tables():
     with database:
