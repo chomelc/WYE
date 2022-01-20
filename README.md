@@ -7,7 +7,7 @@
 - Python 3
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 - [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/)
-- [Flask-RestX](https://flask-restx.readthedocs.io/en/latest/index.html)
+- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/index.html)
 - [Peewee](http://docs.peewee-orm.com/en/latest/)
 - [Click](https://click.palletsprojects.com/en/8.0.x/)
 - [Unidecode](https://pypi.org/project/Unidecode/)
