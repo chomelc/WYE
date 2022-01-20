@@ -1,5 +1,6 @@
 from flask import Flask
-from flask_restful import reqparse, Resource, Api, fields, marshal_with, abort
+from flask_restful import reqparse, fields, marshal_with, abort
+from flask_restx import Resource, Api
 from models import User, Category, Dish, MealDish, Meal, Day, create_tables, populate_tables, drop_tables
 from functions import getDateDay
 import click
@@ -57,12 +58,14 @@ def abort_if_dish_doesnt_exist(dish_slug):
                       for value in elem.values()]:
         abort(404, message="'{}' doesn't exist".format(dish_slug))
 
+# aborting operation if the corresponding slug doesn't exist
 def abort_if_day_doesnt_exist(day_slug):
     query = Day.select(Day.slug).dicts()
     if day_slug not in [value for elem in query
                       for value in elem.values()]:
         abort(404, message="'{}' doesn't exist".format(day_slug))
 
+# aborting operation if the corresponding id doesn't exist
 def abort_if_meal_doesnt_exist(meal_id):
     query = MealDish.select(MealDish.meal).dicts()
     if meal_id not in [value for elem in query
@@ -80,13 +83,13 @@ day_parser.add_argument('dinner')
 
 # ----------- APIs ----------- #
 
+@api.route('/wye/users/')
 class UsersAPI(Resource):
     @marshal_with(users_fields)
     def get(self):
         return [d for d in User.select()]
 
-api.add_resource(UsersAPI, '/wye/users/')
-
+@api.route('/wye/dishes/')
 class DishesAPI(Resource):
     @marshal_with(dishes_fields)
     def get(self):
@@ -100,8 +103,7 @@ class DishesAPI(Resource):
         Dish.create(name=name, slug=slug, category=category)
         return '', 201
 
-api.add_resource(DishesAPI, '/wye/dishes/')
-
+@api.route('/wye/dishes/<string:dish_slug>')
 class DishAPI(Resource):
     @marshal_with(dishes_fields)
     def get(self, dish_slug):
@@ -124,23 +126,20 @@ class DishAPI(Resource):
         query.execute()
         return '', 201
 
-api.add_resource(DishAPI, '/wye/dishes/<string:dish_slug>')
-
+@api.route('/wye/categories')
 class CategoriesAPI(Resource):
     @marshal_with(categories_fields)
     def get(self):
         return [d for d in Category.select()]
 
-api.add_resource(CategoriesAPI, '/wye/categories/')
-
+@api.route('/wye/meals/')
 class MealsAPI(Resource):
     @marshal_with(meals_fields)
     def get(self):
         query = (MealDish.select())
         return [d for d in query]
 
-api.add_resource(MealsAPI, '/wye/meals/')
-
+@api.route('/wye/meals/<int:meal_id>')
 class MealAPI(Resource):
     @marshal_with(meals_fields)
     def get(self, meal_id):
@@ -148,8 +147,7 @@ class MealAPI(Resource):
         query = MealDish.select().where(MealDish.meal == meal_id)
         return [d for d in query]
 
-api.add_resource(MealAPI, '/wye/meals/<int:meal_id>')
-
+@api.route('/wye/days')
 class DaysAPI(Resource):
     @marshal_with(days_fields)
     def get(self):
@@ -165,8 +163,7 @@ class DaysAPI(Resource):
         Day.create(day=getDateDay(date), date=date, slug=date, breakfast=None, lunch=None, dinner=None)
         return '', 201
 
-api.add_resource(DaysAPI, '/wye/days/')
-
+@api.route('/wye/days/<string:day_slug>')
 class DayAPI(Resource):
     # @marshal_with(days_fields)
     def get(self, day_slug):
@@ -195,8 +192,6 @@ class DayAPI(Resource):
         query = Day.update({Day.breakfast: nbreakfast, Day.lunch: nlunch, Day.dinner: ndinner}).where(Day.slug == day_slug)
         query.execute()
         return '', 201
-
-api.add_resource(DayAPI, '/wye/days/<string:day_slug>')
 
 # ----------- CLI COMMANDS ----------- #
 
