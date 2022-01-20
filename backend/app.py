@@ -32,8 +32,7 @@ dishes_fields = {
 dishes_fields['category'] = fields.Nested(categories_fields)
 
 meals_fields = {
-    'meal': fields.Integer,
-    'dishes': fields.List(fields.Nested(dishes_fields))
+    'meal' : { 'dish': fields.Nested(dishes_fields) }
 }
 
 days_fields = {
@@ -132,9 +131,17 @@ class CategoriesAPI(Resource):
 api.add_resource(CategoriesAPI, '/wye/categories/')
 
 class MealsAPI(Resource):
-    @marshal_with(meals_fields)
+    # @marshal_with(meals_fields)
     def get(self):
-        return [d for d in MealDish.select().dicts()]
+        meals = {}
+        dishes = MealDish.select()
+        for dish in dishes:
+            nested_dish = Dish.select().where(Dish.slug == dish.dish_id).dicts().get()
+            if not dish.meal_id in meals:
+                meals[dish.meal_id] = []
+            meals[dish.meal_id].append(nested_dish)
+        response = meals
+        return response
 
 api.add_resource(MealsAPI, '/wye/meals/')
 
@@ -212,4 +219,4 @@ def dropdb():
 # ----------- RUNNING THE APP ----------- #
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

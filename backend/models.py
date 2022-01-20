@@ -65,6 +65,7 @@ def populate_tables():
     MealDish.create(meal=1, dish="poulet-creme")
     MealDish.create(meal=1, dish="riz")
     MealDish.create(meal=2, dish="lasagnes")
+    MealDish.create(meal=2, dish="glace")
     date='18-01-2022'
     Day.create(day=getDateDay(date), date=date, slug=date, breakfast="brunch", lunch=None, dinner="lasagnes")
     date='19-01-2022'
