@@ -1,8 +1,8 @@
 import { Box, Checkbox, Grid, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import React from "react";
-import { type } from "os";
+import React, { useEffect } from "react";
+import { ReactSession } from 'react-client-session';
 
 const styles = {
     barredItem: {
@@ -28,7 +28,41 @@ export default function GroceryListPanel() {
         setChecked(newChecked);
     };
 
-    const items = ["lait", "oeufs", "fromage", "beurre"];
+    const items = new Array();
+
+    const [error, setError] = React.useState(null);
+    const [isLoaded, setIsLoaded] = React.useState(false);
+    const [groceries, setGroceries] = React.useState<any[]>([]);
+    const username = ReactSession.get("username");
+
+    useEffect(() => {
+        fetchGroceries();
+    }, [])
+
+    const fetchGroceries = () => {
+        fetch("http://192.168.0.10:5000/wye/groceries/")
+            .then(res => res.json())
+            .then(
+                (data) => {
+                    setIsLoaded(true);
+                    setGroceries(data);
+                },
+                (error) => {
+                    setIsLoaded(false);
+                    setError(error);
+                }
+            )
+    }
+
+    const json = JSON.stringify(groceries);
+    const json_groceries = JSON.parse(json);
+
+    var user_groceries = json_groceries.filter(o => { return o.g_list.author.slug === username });
+    if (user_groceries != undefined) {
+        user_groceries.forEach(item => {
+            items.push(item)
+        });
+    }
 
     return (
         <Box
@@ -55,11 +89,11 @@ export default function GroceryListPanel() {
             <Grid container alignContent="center" alignItems="center">
                 <List sx={{ width: '100%' }}>
                     {items.map((value) => {
-                        const labelId = `checkbox-list-label-${value}`;
+                        const labelId = `checkbox-list-label-${value.slug}`;
 
                         return (
                             <ListItem
-                                key={value}
+                                key={value.slug}
                                 secondaryAction={
                                     <IconButton edge="end" aria-label="comments">
                                         <DeleteIcon />
@@ -67,17 +101,17 @@ export default function GroceryListPanel() {
                                 }
                                 disablePadding
                             >
-                                <ListItemButton role={undefined} onClick={handleToggle(items.indexOf(value))} dense>
+                                <ListItemButton role={undefined} onClick={handleToggle(items.indexOf(value.slug))} dense>
                                     <ListItemIcon>
                                         <Checkbox
                                             edge="start"
-                                            checked={checked.indexOf(items.indexOf(value)) !== -1}
+                                            checked={checked.indexOf(items.indexOf(value.slug)) !== -1}
                                             tabIndex={-1}
                                             disableRipple
                                             inputProps={{ 'aria-labelledby': labelId }}
                                         />
                                     </ListItemIcon>
-                                    <ListItemText style={ checked.filter(index => index == items.indexOf(value))[0] == items.indexOf(value) ? styles.barredItem : styles.none } id={labelId} primary={value.charAt(0).toUpperCase() + value.slice(1)} />
+                                    <ListItemText style={checked.filter(index => index == items.indexOf(value.slug))[0] == items.indexOf(value.slug) ? styles.barredItem : styles.none} id={labelId} primary={value.item} />
                                 </ListItemButton>
                             </ListItem>
                         );

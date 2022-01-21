@@ -25,7 +25,7 @@ class Item(BaseModel):
     g_list = ForeignKeyField(GroceryList, backref="list")
     item = CharField()
     is_checked = BooleanField()
-    slug = CharField(primary_key=True)
+    slug = CharField()
 
 class Category(BaseModel):
     name = CharField()
