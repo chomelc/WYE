@@ -147,7 +147,7 @@ class MealAPI(Resource):
         query = MealDish.select().where(MealDish.meal == meal_id)
         return [d for d in query]
 
-@api.route('/wye/days')
+@api.route('/wye/days/')
 class DaysAPI(Resource):
     @marshal_with(days_fields)
     def get(self):
