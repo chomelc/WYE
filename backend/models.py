@@ -18,6 +18,15 @@ class User(BaseModel):
     initials = CharField()
     slug = CharField()
 
+class GroceryList(BaseModel):
+    author = ForeignKeyField(User, backref="author")
+
+class Item(BaseModel):
+    g_list = ForeignKeyField(GroceryList, backref="list")
+    item = CharField()
+    is_checked = BooleanField()
+    slug = CharField(primary_key=True)
+
 class Category(BaseModel):
     name = CharField()
     slug = CharField(primary_key=True)
@@ -45,7 +54,7 @@ class Day(BaseModel):
 
 def create_tables():
     with database:
-        database.create_tables([User, Meal, Dish, Category, MealDish, Day])
+        database.create_tables([User, GroceryList, Item, Meal, Dish, Category, MealDish, Day])
 
 def populate_tables():
     first_name="Clémence"
@@ -54,6 +63,13 @@ def populate_tables():
     first_name="Axel"
     last_name="Raux"
     User.create(first_name=first_name, last_name=last_name, initials=first_name[0]+last_name[0], slug=unidecode(first_name).lower()+"_"+unidecode(last_name).lower())
+    GroceryList.create(author=1)
+    GroceryList.create(author=2)
+    Item.create(g_list=1, item="Lait", is_checked=False, slug="lait")
+    Item.create(g_list=1, item="Oeufs", is_checked=False, slug="oeufs")
+    Item.create(g_list=1, item="Fromage", is_checked=False, slug="fromage")
+    Item.create(g_list=1, item="Beurre", is_checked=False, slug="beurre")
+    Item.create(g_list=2, item="Princes", is_checked=True, slug="princes")
     Category.create(name="Entrée", slug="entree")
     Category.create(name="Plat", slug="plat")
     Category.create(name="Dessert", slug="dessert")
@@ -79,4 +95,4 @@ def populate_tables():
 
 def drop_tables():
     with database:
-        database.drop_tables([User, Meal, Dish, Category, MealDish, Day])
+        database.drop_tables([User, GroceryList, Item, Meal, Dish, Category, MealDish, Day])
