@@ -1,7 +1,7 @@
 from peewee import *
 import click
 from unidecode import unidecode
-from functions import getDateDay
+from functions.functions import getDateDay
 
 database = SqliteDatabase("db/meals.sqlite3")
 
