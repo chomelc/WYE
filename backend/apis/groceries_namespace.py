@@ -1,4 +1,4 @@
-from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort
+from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort, inputs
 from models import GroceryList, Item
 from .users_namespace import users_fields
 from unidecode import unidecode
@@ -8,7 +8,7 @@ from functions.api_functions import abort_if_item_doesnt_exist
 grocery_parser = reqparse.RequestParser()
 grocery_parser.add_argument('list')
 grocery_parser.add_argument('item')
-grocery_parser.add_argument('is_checked')
+grocery_parser.add_argument('is_checked', type=inputs.boolean)
 
 # ----------- FIELDS ----------- #
 
@@ -39,7 +39,7 @@ class GroceriesAPI(Resource):
         g_list = args['list']
         item = args['item']
         slug = unidecode(item).lower()
-        is_checked = args['is_checked']
+        is_checked = bool(args['is_checked'])
         Item.create(g_list=g_list, item=item, is_checked=is_checked, slug=slug)
         return '', 201
 
@@ -60,3 +60,13 @@ class ItemAPI(Resource):
         query = Item.delete().where(Item.slug == item_slug)
         query.execute()
         return '', 204
+
+    @api.response(201, 'Success')
+    @api.doc(params={'item_slug': 'The slug of the corresponding item'})
+    def put(self, item_slug):
+        abort_if_item_doesnt_exist(item_slug)
+        args = grocery_parser.parse_args()
+        nis_checked = bool(args['is_checked'])
+        query = Item.update({Item.is_checked: nis_checked}).where(Item.slug == item_slug)
+        query.execute()
+        return '', 201

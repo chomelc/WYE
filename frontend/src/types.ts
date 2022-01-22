@@ -11,3 +11,14 @@ export enum FetchState {
     initials: string;
     slug: string;
   };
+
+  export type GroceryListData = {
+    author: UserData;
+  }
+
+  export type ItemData = {
+    item: string;
+    is_checked: boolean;
+    slug: string;
+    g_list: GroceryListData;
+  };
