@@ -1,6 +1,6 @@
 # :fork_and_knife: WYE - What ya eatin'?
 
-## Back-end
+## :gear: Back-end
 
 ### Dependencies
 
@@ -17,14 +17,31 @@ Install all the dependencies with:
 pip install -r requirements.txt
 ```
 
-## Launching the server
+### Manipulating the database
+
+Drop the tables with:
+```bash
+flask dropdb
+```
+
+Initialize the database with:
+```bash
+flask initdb
+```
+
+Populate the database with:
+```bash
+flask populatedb
+```
+
+### Launching the server
 
 Launch the server with: 
 ```bash
 python app.py
 ```
 
-## Front-end
+## :dart: Front-end
 
 ### Getting Started with Create React App
 
