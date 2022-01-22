@@ -1,34 +1,20 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux'
 import { ReactSession } from 'react-client-session';
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPanel() {
-    const navigate = useNavigate()
-    const [error, setError] = React.useState(null);
-    const [isLoaded, setIsLoaded] = React.useState(false);
-    const [users, setUsers] = React.useState<any[]>([])
+    const navigate = useNavigate();
+    
+    const users: IUser[] = useSelector(
+        (state: UserState) => state.users)
 
     const [user, setUser] = React.useState('');
 
     const handleUserChange = (event: SelectChangeEvent) => {
         setUser(event.target.value);
     };
-
-    useEffect(() => {
-        fetch("http://192.168.0.10:5000/wye/users/")
-            .then(res => res.json())
-            .then(
-                (data) => {
-                    setIsLoaded(true);
-                    setUsers(data);
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
-    }, [])
 
     const handleSubmit = evt => {
         evt.preventDefault();
@@ -57,7 +43,7 @@ export default function LoginPanel() {
                                     color="primary"
                                     style={{ marginBottom: 12 }}
                                 >
-                                    {users?.map(u => {
+                                    {users.map(u => {
                                         return (
                                             <MenuItem key={u.slug} value={u.slug}>
                                                 {u.first_name + " " + u.last_name ?? u.slug}
