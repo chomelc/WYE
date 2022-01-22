@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort
+from functions.functions import getDishSlug
 from .categories_namespace import categories_fields
 from models import Dish, Category
-from unidecode import unidecode
 from functions.api_functions import abort_if_dish_doesnt_exist
 
 # initializing parser
@@ -32,7 +32,7 @@ class DishesAPI(Resource):
     def post(self):
         args = dish_parser.parse_args()
         name = args['name']
-        slug = unidecode(name).lower()
+        slug = getDishSlug(name)
         category = args['category']
         Dish.create(name=name, slug=slug, category=category)
         return '', 201
