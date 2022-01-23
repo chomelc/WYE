@@ -1,24 +1,28 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React from 'react';
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ReactSession } from 'react-client-session';
 import { useNavigate } from "react-router-dom";
+import { getUser } from "../state/actions/user.actions";
 
 export default function LoginPanel() {
     const navigate = useNavigate();
     
     const users: IUser[] = useSelector(
-        (state: UserState) => state.users)
+        (state: UsersState) => state.users)
 
-    const [user, setUser] = React.useState('');
+    const [username, setUsername] = React.useState('');
 
     const handleUserChange = (event: SelectChangeEvent) => {
-        setUser(event.target.value);
+        setUsername(event.target.value);
     };
+
+    const dispatch = useDispatch();
 
     const handleSubmit = evt => {
         evt.preventDefault();
-        ReactSession.set("username", user);
+        ReactSession.set("username", username);
+        dispatch(getUser(username));
         navigate("/meals");
     }
 
@@ -37,13 +41,13 @@ export default function LoginPanel() {
                                 <Select
                                     labelId="user"
                                     id="user-select"
-                                    value={user}
+                                    value={username}
                                     label="Utilisateur"
                                     onChange={handleUserChange}
                                     color="primary"
                                     style={{ marginBottom: 12 }}
                                 >
-                                    {users.map(u => {
+                                    {users.length > 0 &&  users.map(u => {
                                         return (
                                             <MenuItem key={u.slug} value={u.slug}>
                                                 {u.first_name + " " + u.last_name ?? u.slug}

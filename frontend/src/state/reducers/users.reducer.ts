@@ -1,8 +1,8 @@
 import { GET_USERS } from "../actions/users.actions"
 
-const initialState: UserState = { users: [] }
+const initialState: UsersState = { users: [] }
 
-export default function usersReducer(state = initialState, action: UserAction) {
+export default function usersReducer(state = initialState, action: UsersAction) {
     switch (action.type) {
         case GET_USERS:
             return action.payload

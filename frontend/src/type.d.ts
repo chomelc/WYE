@@ -6,12 +6,21 @@ interface IUser {
 }
 
 type UserState = {
-    users: IUser[]
+    user: IUser[]
 }
 
 type UserAction = {
-    type: string
+    type: string,
     payload: IUser
+}
+
+type UsersState = {
+    users: IUser[]
+}
+
+type UsersAction = {
+    type: string
+    payload: IUser[]
 }
 
 interface IGroceryList {
