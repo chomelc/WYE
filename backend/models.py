@@ -27,14 +27,9 @@ class Item(BaseModel):
     is_checked = BooleanField()
     slug = CharField()
 
-class Category(BaseModel):
-    name = CharField()
-    slug = CharField(primary_key=True)
-
 class Dish(BaseModel):
     name = CharField()
     slug = CharField(primary_key=True)
-    category = ForeignKeyField(Category, backref="dish")
 
 class Day(BaseModel):
     day = CharField()
@@ -48,7 +43,7 @@ class Day(BaseModel):
 
 def create_tables():
     with database:
-        database.create_tables([User, GroceryList, Item, Dish, Category, Day])
+        database.create_tables([User, GroceryList, Item, Dish, Day])
 
 def populate_tables():
     first_name="Clémence"
@@ -64,13 +59,10 @@ def populate_tables():
     Item.create(g_list="clemence_chomel", item="Fromage", is_checked=False, slug="fromage")
     Item.create(g_list="clemence_chomel", item="Beurre", is_checked=False, slug="beurre")
     Item.create(g_list="axel_raux", item="Princes", is_checked=True, slug="princes")
-    Category.create(name="Entrée", slug="entree")
-    Category.create(name="Plat", slug="plat")
-    Category.create(name="Dessert", slug="dessert")
-    Dish.create(name="Lasagnes", slug="lasagnes", category="plat")
-    Dish.create(name="Poulet à la crème & riz", slug="poulet-creme-riz", category="plat")
-    Dish.create(name="Tomates-Mozza", slug="tomates-mozza", category="entree")
-    Dish.create(name="Brunch", slug="brunch", category="plat")
+    Dish.create(name="Lasagnes", slug="lasagnes")
+    Dish.create(name="Poulet à la crème & riz", slug="poulet-creme-riz")
+    Dish.create(name="Tomates-Mozza", slug="tomates-mozza")
+    Dish.create(name="Brunch", slug="brunch")
     date='18-01-2022'
     Day.create(day=getDateDay(date), date=date, slug=date, breakfast="brunch", lunch=None, dinner="poulet-creme-riz")
     date='19-01-2022'
@@ -78,4 +70,4 @@ def populate_tables():
 
 def drop_tables():
     with database:
-        database.drop_tables([User, GroceryList, Item, Dish, Category, Day])
+        database.drop_tables([User, GroceryList, Item, Dish, Day])

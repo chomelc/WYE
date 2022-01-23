@@ -1,13 +1,11 @@
 from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort
 from functions.functions import getDishSlug
-from .categories_namespace import categories_fields
-from models import Dish, Category
+from models import Dish
 from functions.api_functions import abort_if_dish_doesnt_exist
 
 # initializing parser
 dish_parser = reqparse.RequestParser()
 dish_parser.add_argument('name')
-dish_parser.add_argument('category')
 
 # ----------- FIELDS ----------- #
 
@@ -15,7 +13,6 @@ dishes_fields = {
     'name': fields.String,
     'slug': fields.String, 
 }
-dishes_fields['category'] = fields.Nested(categories_fields)
 
 # ----------- API ----------- #
 
@@ -34,7 +31,7 @@ class DishesAPI(Resource):
         name = args['name']
         slug = getDishSlug(name)
         category = args['category']
-        Dish.create(name=name, slug=slug, category=category)
+        Dish.create(name=name, slug=slug)
         return '', 201
 
 @api.route('/<string:dish_slug>')
@@ -44,7 +41,7 @@ class DishAPI(Resource):
     @api.doc(params={'dish_slug': 'The slug of the corresponding dish'})
     def get(self, dish_slug):
         abort_if_dish_doesnt_exist(dish_slug)
-        query = Dish.select().where(Dish.slug == dish_slug).join(Category, on=(Category.slug == Dish.category))
+        query = Dish.select().where(Dish.slug == dish_slug)
         return [d for d in query]
 
     @api.response(204, 'Success')
@@ -61,7 +58,6 @@ class DishAPI(Resource):
         abort_if_dish_doesnt_exist(dish_slug)
         args = dish_parser.parse_args()
         nname = args['name']
-        ncategory = args['category']
-        query = Dish.update({Dish.name: nname, Dish.category: ncategory}).where(Dish.slug == dish_slug)
+        query = Dish.update({Dish.name: nname}).where(Dish.slug == dish_slug)
         query.execute()
         return '', 201
