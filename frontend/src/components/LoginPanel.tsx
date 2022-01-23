@@ -24,7 +24,7 @@ export default function LoginPanel() {
         evt.preventDefault();
         ReactSession.set("username", username);
         dispatch(getUser(username));
-        dispatch(getItems());
+        dispatch(getItems(username));
         navigate("/meals");
     }
 

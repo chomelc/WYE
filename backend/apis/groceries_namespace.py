@@ -1,8 +1,8 @@
 from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort, inputs
-from models import GroceryList, Item
+from models import GroceryList, Item, User
 from .users_namespace import users_fields
 from unidecode import unidecode
-from functions.api_functions import abort_if_item_doesnt_exist
+from functions.api_functions import abort_if_item_doesnt_exist, abort_if_user_doesnt_exist
 
 # initializing parser
 grocery_parser = reqparse.RequestParser()
@@ -43,30 +43,47 @@ class GroceriesAPI(Resource):
         Item.create(g_list=g_list, item=item, is_checked=is_checked, slug=slug)
         return '', 201
 
-@api.route('/<string:item_slug>')
+@api.route('/<string:user_slug>')
 class ItemAPI(Resource):
     @marshal_with(grocery_list_fields)
     @api.response(200, 'Success')
+    @api.doc(params={'user_slug': 'The slug of the corresponding user'})
+    def get(self, user_slug):
+        abort_if_user_doesnt_exist(user_slug)
+        query = (Item.select()
+        .where(Item.g_list == user_slug))
+        return [d for d in query]
+
+@api.route('/<string:user_slug>/<string:item_slug>')
+class ItemAPI(Resource):
+    @marshal_with(grocery_list_fields)
+    @api.response(200, 'Success')
+    @api.doc(params={'user_slug': 'The slug of the corresponding user'})
     @api.doc(params={'item_slug': 'The slug of the corresponding item'})
-    def get(self, item_slug):
+    def get(self, user_slug, item_slug):
+        abort_if_user_doesnt_exist(user_slug)
         abort_if_item_doesnt_exist(item_slug)
-        query = (Item.select().where(Item.slug == item_slug))
+        query = (Item.select().where(Item.slug == item_slug).where(Item.g_list == user_slug))
         return [d for d in query]
 
     @api.response(204, 'Success')
+    @api.doc(params={'user_slug': 'The slug of the corresponding user'})
     @api.doc(params={'item_slug': 'The slug of the corresponding item'})
-    def delete(self, item_slug):
+    def delete(self, user_slug, item_slug):
+        abort_if_user_doesnt_exist(user_slug)
         abort_if_item_doesnt_exist(item_slug)
-        query = Item.delete().where(Item.slug == item_slug)
+        query = (Item.delete().where(Item.slug == item_slug).where(Item.g_list == user_slug))
         query.execute()
         return '', 204
 
     @api.response(201, 'Success')
+    @api.doc(params={'user_slug': 'The slug of the corresponding user'})
     @api.doc(params={'item_slug': 'The slug of the corresponding item'})
-    def put(self, item_slug):
+    def put(self, user_slug, item_slug):
+        abort_if_user_doesnt_exist(user_slug)
         abort_if_item_doesnt_exist(item_slug)
         args = grocery_parser.parse_args()
         nis_checked = bool(args['is_checked'])
-        query = Item.update({Item.is_checked: nis_checked}).where(Item.slug == item_slug)
+        query = Item.update({Item.is_checked: nis_checked}).where(Item.slug == item_slug).where(Item.g_list == user_slug)
         query.execute()
         return '', 201

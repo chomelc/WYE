@@ -14,7 +14,6 @@ const styles = {
 };
 
 export default function GroceryListPanel() {
-    const username = ReactSession.get("username");
     const items: IItem[] = useSelector(
         (state: ItemState) => state.items)
 
@@ -42,32 +41,29 @@ export default function GroceryListPanel() {
             </Grid>
             <Grid container alignContent="center" alignItems="center">
                 <List sx={{ width: '100%' }}>
-                    {items.length >0 && items.map((item) => (
-                        item.g_list.author.slug == username
-                            ?
-                            <ListItem
-                                key={item.slug}
-                                secondaryAction={
-                                    <IconButton edge="end" aria-label="delete">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                }
-                                disablePadding
-                            >
-                                <ListItemButton role={undefined} dense>
-                                    <ListItemIcon>
-                                        <Checkbox
-                                            edge="start"
-                                            checked={item.is_checked}
-                                            tabIndex={-1}
-                                            disableRipple
-                                            inputProps={{ 'aria-labelledby': `checkbox-list-label-${item.slug}` }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText style={item.is_checked ? styles.barredItem : styles.none} id={`checkbox-list-label-${item.slug}`} primary={item.item} />
-                                </ListItemButton>
-                            </ListItem>
-                            : null
+                    {items.length > 0 && items.map((item) => (
+                        <ListItem
+                            key={item.slug}
+                            secondaryAction={
+                                <IconButton edge="end" aria-label="delete">
+                                    <DeleteIcon />
+                                </IconButton>
+                            }
+                            disablePadding
+                        >
+                            <ListItemButton role={undefined} dense>
+                                <ListItemIcon>
+                                    <Checkbox
+                                        edge="start"
+                                        checked={item.is_checked}
+                                        tabIndex={-1}
+                                        disableRipple
+                                        inputProps={{ 'aria-labelledby': `checkbox-list-label-${item.slug}` }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText style={item.is_checked ? styles.barredItem : styles.none} id={`checkbox-list-label-${item.slug}`} primary={item.item} />
+                            </ListItemButton>
+                        </ListItem>
                     ))}
                 </List>
             </Grid>

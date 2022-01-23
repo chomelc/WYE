@@ -16,10 +16,10 @@ class User(BaseModel):
     first_name = CharField()
     last_name = CharField()
     initials = CharField()
-    slug = CharField()
+    slug = CharField(primary_key=True)
 
 class GroceryList(BaseModel):
-    author = ForeignKeyField(User, backref="author")
+    author = ForeignKeyField(User, backref="author", primary_key=True)
 
 class Item(BaseModel):
     g_list = ForeignKeyField(GroceryList, backref="list")
@@ -63,13 +63,13 @@ def populate_tables():
     first_name="Axel"
     last_name="Raux"
     User.create(first_name=first_name, last_name=last_name, initials=first_name[0]+last_name[0], slug=unidecode(first_name).lower()+"_"+unidecode(last_name).lower())
-    GroceryList.create(author=1)
-    GroceryList.create(author=2)
-    Item.create(g_list=1, item="Lait", is_checked=False, slug="lait")
-    Item.create(g_list=1, item="Oeufs", is_checked=False, slug="oeufs")
-    Item.create(g_list=1, item="Fromage", is_checked=False, slug="fromage")
-    Item.create(g_list=1, item="Beurre", is_checked=False, slug="beurre")
-    Item.create(g_list=2, item="Princes", is_checked=True, slug="princes")
+    GroceryList.create(author="clemence_chomel")
+    GroceryList.create(author="axel_raux")
+    Item.create(g_list="clemence_chomel", item="Lait", is_checked=False, slug="lait")
+    Item.create(g_list="clemence_chomel", item="Oeufs", is_checked=False, slug="oeufs")
+    Item.create(g_list="clemence_chomel", item="Fromage", is_checked=False, slug="fromage")
+    Item.create(g_list="clemence_chomel", item="Beurre", is_checked=False, slug="beurre")
+    Item.create(g_list="axel_raux", item="Princes", is_checked=True, slug="princes")
     Category.create(name="Entrée", slug="entree")
     Category.create(name="Plat", slug="plat")
     Category.create(name="Dessert", slug="dessert")
