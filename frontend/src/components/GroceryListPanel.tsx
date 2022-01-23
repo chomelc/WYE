@@ -3,7 +3,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useEffect } from "react";
 import { ReactSession } from 'react-client-session';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteItem } from "../state/actions/items.actions";
 
 const styles = {
     barredItem: {
@@ -14,6 +15,7 @@ const styles = {
 };
 
 export default function GroceryListPanel() {
+    const dispatch = useDispatch();
     const items: IItem[] = useSelector(
         (state: ItemState) => state.items)
 
@@ -45,6 +47,7 @@ export default function GroceryListPanel() {
                         <ListItem
                             key={item.slug}
                             secondaryAction={
+                                // onClick={dispatch(deleteItem(item.g_list.author.slug, item.slug))}
                                 <IconButton edge="end" aria-label="delete">
                                     <DeleteIcon />
                                 </IconButton>
