@@ -40,7 +40,7 @@ type ItemState = {
 
 type ItemAction = {
     type: string
-    item: IItem
+    payload: IItem
 }
 
-type DispatchType = ((args: UserAction) => UserAction) | ((args: ItemAction) => ItemAction)
+type DispatchType = ((args: UserAction) => UserAction) | ((args: UsersAction) => UsersAction) | ((args: ItemAction) => ItemAction)

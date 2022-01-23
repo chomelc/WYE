@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ReactSession } from 'react-client-session';
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../state/actions/user.actions";
+import { getItems } from "../state/actions/items.actions";
 
 export default function LoginPanel() {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function LoginPanel() {
         evt.preventDefault();
         ReactSession.set("username", username);
         dispatch(getUser(username));
+        dispatch(getItems());
         navigate("/meals");
     }
 
