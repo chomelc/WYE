@@ -1,8 +1,8 @@
 from flask_restx import Namespace, Resource, reqparse, fields, marshal_with, abort
-from .meals_namespace import meal_fields
 from models import Day
 from functions.functions import getDateDay
 from functions.api_functions import  abort_if_day_doesnt_exist
+from .dishes_namespace import dishes_fields
 
 # initializing parser
 day_parser = reqparse.RequestParser()
@@ -17,9 +17,9 @@ days_fields = {
     'day': fields.String,
     'date': fields.String,
     'slug':  fields.String,
-    'breakfast': fields.Nested(meal_fields),
-    'lunch"': fields.Nested(meal_fields),
-    'dinner': fields.Nested(meal_fields)
+    'breakfast': fields.Nested(dishes_fields),
+    'lunch': fields.Nested(dishes_fields),
+    'dinner': fields.Nested(dishes_fields)
 }
 
 # ----------- API ----------- #
@@ -31,10 +31,7 @@ class DaysAPI(Resource):
     @marshal_with(days_fields)
     @api.response(200, 'Success')
     def get(self):
-        query = (Day.select()
-        .group_by(Day.slug).order_by(Day.date)
-        )
-        print(query)
+        query = (Day.select())
         return [d for d in query]
 
     @api.response(201, 'Success')
@@ -51,8 +48,7 @@ class DayAPI(Resource):
     @api.doc(params={'day_slug': 'The slug of the corresponding day'})
     def get(self, day_slug):
         abort_if_day_doesnt_exist(day_slug)
-        query = (Day.select().where(Day.slug == day_slug)
-            .group_by(Day.slug))
+        query = (Day.select().where(Day.slug == day_slug))
         return [d for d in query]
 
     @api.response(204, 'Success')

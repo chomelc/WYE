@@ -1,5 +1,5 @@
 from flask_restx import abort
-from models import Dish, Item, MealDish, Day, User
+from models import Dish, Item, Day, User
 
 
 # aborting operation if the corresponding slug doesn't exist
@@ -22,13 +22,6 @@ def abort_if_item_doesnt_exist(item_slug):
     if item_slug not in [value for elem in query
                       for value in elem.values()]:
         abort(404, message="'{}' doesn't exist".format(item_slug))
-
-# aborting operation if the corresponding id doesn't exist
-def abort_if_meal_doesnt_exist(meal_id):
-    query = MealDish.select(MealDish.meal).dicts()
-    if meal_id not in [value for elem in query
-                      for value in elem.values()]:
-        abort(404, message="'{}' doesn't exist".format(meal_id))
 
 # aborting operation if the corresponding slug doesn't exist
 def abort_if_day_doesnt_exist(day_slug):
