@@ -7,8 +7,10 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { store } from './state/store';
 import { getUsers } from './state/actions/users.actions';
+import { getDays } from './state/actions/days.actions';
 
 store.dispatch<any>(getUsers());
+store.dispatch<any>(getDays());
 
 ReactDOM.render(
   <React.StrictMode>

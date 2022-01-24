@@ -23,6 +23,29 @@ type UsersAction = {
     payload: IUser[]
 }
 
+interface IDish {
+    name: string
+    slug: string
+}
+
+interface IDay {
+    day: string
+    date: string
+    slug: string
+    breakfast: IDish
+    lunch: IDish
+    dinner: IDish
+}
+
+type DayState = {
+    days: IDay[]
+}
+
+type DayAction = {
+    type: string
+    payload: IDay
+}
+
 interface IGroceryList {
     author: IUser
 }
@@ -43,4 +66,4 @@ type ItemAction = {
     payload: IItem
 }
 
-type DispatchType = ((args: UserAction) => UserAction) | ((args: UsersAction) => UsersAction) | ((args: ItemAction) => ItemAction)
+type DispatchType = ((args: UserAction) => UserAction) | ((args: UsersAction) => UsersAction) | ((args: DayAction) => DayAction) | ((args: ItemAction) => ItemAction)
