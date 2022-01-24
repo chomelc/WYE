@@ -3,5 +3,5 @@ import ProfilePanel from "../components/ProfilePanel"
 import HeaderBar from "../components/HeaderBar";
 
 export default function Profile() {
-    return (<div> <HeaderBar settings={true}/><ProfilePanel /><BottomMenu /></div>);
+    return (<div> <HeaderBar settings={true} backButton={false}/><ProfilePanel /><BottomMenu /></div>);
 }
