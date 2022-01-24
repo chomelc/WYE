@@ -38,12 +38,21 @@ interface IDay {
 }
 
 type DayState = {
-    days: IDay[]
+    day: IDay[]
 }
 
 type DayAction = {
     type: string
     payload: IDay
+}
+
+type DaysState = {
+    days: IDay[]
+}
+
+type DaysAction = {
+    type: string
+    payload: IDay[]
 }
 
 interface IGroceryList {
@@ -66,4 +75,4 @@ type ItemAction = {
     payload: IItem
 }
 
-type DispatchType = ((args: UserAction) => UserAction) | ((args: UsersAction) => UsersAction) | ((args: DayAction) => DayAction) | ((args: ItemAction) => ItemAction)
+type DispatchType = ((args: UserAction) => UserAction) | ((args: UsersAction) => UsersAction) | ((args: DayAction) => DayAction) | ((args: DaysAction) => DaysAction) | ((args: ItemAction) => ItemAction)
