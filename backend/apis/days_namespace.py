@@ -31,7 +31,7 @@ class DaysAPI(Resource):
     @marshal_with(days_fields)
     @api.response(200, 'Success')
     def get(self):
-        query = (Day.select())
+        query = (Day.select().order_by(Day.date))
         return [d for d in query]
 
     @api.response(201, 'Success')
