@@ -32,7 +32,7 @@ export default function MealsPanel() {
                 if ((isInTheFuture(d.date)) && counter < 7) {
                     counter++;
                     return (
-                        <MealsCard d={d} />
+                        <MealsCard d={d} history={false} />
                     );
                 }
             })}

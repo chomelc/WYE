@@ -22,6 +22,7 @@ const currentDay = createTheme({
 
 export default function MealsCard(props) {
     const d: IDay = props.d;
+    const historyBool: boolean = props.history;
 
     const date = getCurrentDate();
 
@@ -36,8 +37,10 @@ export default function MealsCard(props) {
 
     const handleClick = (slug: string) => evt => {
         evt.preventDefault();
-        dispatch(getDay(slug));
-        navigate("/meals/" + slug);
+        if (!historyBool) {
+            dispatch(getDay(slug));
+            navigate("/meals/" + slug);
+        }
     }
     return (
         <ThemeProvider theme={isCurrentDate(d.date) ? currentDay : defaultTheme}>
