@@ -6,6 +6,7 @@ import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import CoffeeIcon from '@mui/icons-material/Coffee';
 import { getDay } from "../state/actions/day.actions";
+import { getCurrentDate } from "../modules/utils";
 
 const green = "#1D5722";
 const lightGreen = alpha("#1D5722", 0.2);
@@ -22,10 +23,7 @@ const currentDay = createTheme({
 export default function MealsCard(props) {
     const d: IDay = props.d;
 
-    const current = new Date();
-    var month = ("0" + (current.getMonth() + 1)).slice(-2);
-    var day = ("0" + current.getDate()).slice(-2);
-    const date = `${day}-${month}-${current.getFullYear()}`;
+    const date = getCurrentDate();
 
     const isCurrentDate = (d) => {
         if (d == date)

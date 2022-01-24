@@ -1,13 +1,11 @@
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
+import { getCurrentDate } from "../modules/utils";
 import MealsCard from "./MealsCard";
 
 export default function MealsPanel() {
     let counter: number = 0;
-    const current = new Date();
-    var month = ("0" + (current.getMonth() + 1)).slice(-2);
-    var day = ("0" + current.getDate()).slice(-2);
-    const date = `${day}-${month}-${current.getFullYear()}`;
+    const date = getCurrentDate();
 
     const days: IDay[] = useSelector(
         (state: DaysState) => state.days)
